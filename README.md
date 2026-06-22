@@ -16,6 +16,9 @@ Build a command-line to-do application that persists tasks to a JSON file.
 # Day-4
 Build a simple React notes application.
 
+# Day-5
+Create a FastAPI app with one custom endpoint and run it in Docker.
+
 
 
 

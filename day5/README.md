@@ -11,7 +11,7 @@ Returns:
 - Name
 - Skills learned this week
 
-## Install Dependencies
+## Install Dependencies-
 
 pip install -r requirements.txt
 

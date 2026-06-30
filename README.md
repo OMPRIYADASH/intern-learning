@@ -19,6 +19,12 @@ Build a simple React notes application.
 # Day-5
 Create a FastAPI app with one custom endpoint and run it in Docker.
 
+# Day 6: AI Use Cases in Engineering
 
+- Explored 10 real-world AI use cases in software engineering.
+- Mapped each use case to its AI capability.
+- Documented concrete inputs and outputs.
+- Included company-specific use cases.
+- Chose the first implementation idea with a brief justification.
 
 

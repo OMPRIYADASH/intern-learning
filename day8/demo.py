@@ -1,37 +1,74 @@
-import os
-from dotenv import load_dotenv
 import google.generativeai as genai
- 
+from dotenv import load_dotenv
+import json
+import sys
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+prompt_path = os.path.join(BASE_DIR, "prompts", "document-summarizer-json.md")
+
+with open(prompt_path, "r", encoding="utf-8") as f:
+    prompt_template = f.read()
+
+# Load environment variables
 load_dotenv()
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
- 
+
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    print("ERROR: Missing GEMINI_API_KEY")
+    sys.exit(1)
+
+# Configure Gemini
+genai.configure(api_key=API_KEY)
+
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
-    system_instruction="You are a concise assistant for engineers."
+    system_instruction="You return ONLY valid JSON. No markdown, no backticks."
 )
- 
-# --- Step 1: Basic call ---
-# print("=== Basic Call ===")
-# response = model.generate_content("Explain Docker in 2 sentences.")
-# print(response.text)
-# print(f"Tokens used: {response.usage_metadata}\n")
- 
-# --- Step 2: Temperature comparison ---
-print("=== Temperature Comparison ===")
-for temp in [0, 1]:
-    config = genai.GenerationConfig(temperature=temp, max_output_tokens=100)
-    response = model.generate_content(
-        "Give me a creative name for a Python logging library.",
-        generation_config=config
+
+# Read file safely
+
+
+def read_file(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"ERROR: File not found -> {path}")
+        sys.exit(1)
+
+
+# Ensure input argument is provided
+if len(sys.argv) < 2:
+    print("Usage: python demo.py input.txt")
+    sys.exit(1)
+
+# Read input document
+document = read_file(sys.argv[1])
+
+
+# Inject document into prompt
+prompt = prompt_template.replace("{{document}}", document)
+
+try:
+    response = model.generate_content(prompt)
+
+    # ✅ SAFE JSON CLEANING (IMPORTANT FIX)
+    cleaned = (
+        response.text
+        .strip()
+        .replace("```json", "")
+        .replace("```", "")
     )
-    print(f"temp={temp}: {response.text.strip()}\n")
- 
-# --- Step 3: Streaming ---
-# print("=== Streaming ===")
-# response = model.generate_content(
-#     "Write a haiku about Git.",
-#     stream=True
-# )
-for chunk in response:
-    print(chunk.text, end="", flush=True)
-print()
+
+    data = json.loads(cleaned)
+
+    print("\nParsed Output:\n")
+    print(json.dumps(data, indent=2))
+
+except json.JSONDecodeError:
+    print("ERROR: Model returned invalid JSON")
+
+except Exception as e:
+    print("ERROR:", str(e))

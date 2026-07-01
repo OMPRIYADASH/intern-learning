@@ -46,4 +46,11 @@ Create a FastAPI app with one custom endpoint and run it in Docker.
 - Parsed and displayed the JSON output in Python.
 - Organized the project with proper folders and dependencies.
 
+# Day 9: Chunk & Embed a Document
+- Loaded a real document into Python.
+- Split the document into smaller chunks.
+- Generated embeddings using the Gemini Embedding API.
+- Saved chunks and embeddings to embeddings.json.
+- Retrieved the top 3 relevant chunks using cosine similarity.
+- Used the best chunk to answer user queries with the LLM.
 
